@@ -72,6 +72,21 @@ namespace VYTAL_SAT_DPLL
         }
 
 
+        public int CountClausesOfGivenLengthThatContainLiteral(int literal, int length)
+        {
+            int count = 0;
+            foreach (Clause clause in Clauses)
+            {
+                if (clause.Literals.Contains(literal) && clause.Literals.Count == length)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+
         public int CountOccurrences(int literal)
         {
             return Clauses.Count(c => c.Literals.Contains(literal));
@@ -101,6 +116,16 @@ namespace VYTAL_SAT_DPLL
             }
             sb.Append("}");
             return sb.ToString();
+        }
+
+
+        public void RemoveClausesContainingLiteralAndRemoveNegationOfLiteralFromAllOtherClauses(int literal)
+        {
+            // remove all clauses containing the same literal as the one in the unitClause
+            Clauses.RemoveAll(c => c.Literals.Any(l => l == literal));
+
+            // and remove all instances of negation of the literal in all Clauses
+            Clauses.ForEach(c => c.Literals.RemoveAll(l => l == -literal));
         }
     }
 }

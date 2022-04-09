@@ -1,5 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-
+﻿
 using VYTAL_SAT_DPLL;
 
 
@@ -30,14 +29,50 @@ catch (OverflowException e )
 
 
 Console.WriteLine(F);
+Console.WriteLine();
 long countCalls = 0;
-Console.WriteLine("\nDPLL says that this Formula " + (DPLL(F, ref countCalls) ? "IS satisfiable" : "is NOT satisfiable"));
-Console.WriteLine("DPLL was called " + countCalls + " times");
+//Console.WriteLine("\nDPLL says that this Formula " + (DPLL(F, ref countCalls) ? "IS satisfiable" : "is NOT satisfiable"));
+//Console.WriteLine("DPLL was called " + countCalls + " times");
+
+HeuristicsTest();
 
 
+void HeuristicsTest()
+{
+    Formula f = new();
+    
+
+        Console.WriteLine("----------------------------------------------------");
+
+    Formula original = DimacsParser.Parse(filePath);
+    
+    
+    //Console.WriteLine("Formula: [" + f.InputLiterals + "; " + f.InputClauses + "]");
+    Console.WriteLine("Is satisfiable: DLIS: " + (DPLL(F.Copy(), ref countCalls, "DLIS") ? "IS satisfiable" : "is NOT satisfiable"));
+    Console.WriteLine("Recursive calls: DLIS: " + countCalls);
+    countCalls = 0;
+    Console.WriteLine();
+
+    Console.WriteLine("Is satisfiable: DLCS: " + (DPLL(F.Copy(), ref countCalls, "DLCS") ? "IS satisfiable" : "is NOT satisfiable"));
+    Console.WriteLine("Recursive calls: DLCS: " + countCalls);
+    countCalls = 0;
+    Console.WriteLine();
+
+    Console.WriteLine("Is satisfiable: MOM: " + (DPLL(F.Copy(), ref countCalls, "MOM") ? "IS satisfiable" : "is NOT satisfiable"));
+    Console.WriteLine("Recursive calls: MOM: " + countCalls);
+    countCalls = 0;
+    Console.WriteLine();
+
+    Console.WriteLine("Is satisfiable: BOHM: " + (DPLL(F.Copy(), ref countCalls, "BOHM") ? "IS satisfiable" : "is NOT satisfiable"));
+    Console.WriteLine("Recursive calls: BOHM: " + countCalls);
+    countCalls = 0;
+    Console.WriteLine();
 
 
-static bool DPLL(Formula F, ref long countCalls)
+}
+
+
+static bool DPLL(Formula F, ref long countCalls, string H)
 {
     countCalls += 1;
     // if an empty clause is present then NOT-SAT
@@ -48,44 +83,58 @@ static bool DPLL(Formula F, ref long countCalls)
     if (F.Clauses.Count == 0)
         return true;
 
+    // find unit clause and if it exists, 
+    Clause? unitClause = F.Clauses.FirstOrDefault(c => c.Literals.Count() == 1);
+    if (unitClause != null)
+    {
+        F.RemoveClausesContainingLiteralAndRemoveNegationOfLiteralFromAllOtherClauses(unitClause.Literals.First());
+
+        return DPLL(F, ref countCalls, H);
+    }
+
     // find pureLiteral and if it exists, remove all clauses containing this literal
     int? pureLiteral = F.GetPureLiteral();
     if (pureLiteral != null)
     {
         F.Clauses.RemoveAll(c => c.Literals.Any(l => l == pureLiteral));
-        return DPLL(F, ref countCalls);
+        return DPLL(F, ref countCalls, H);
     }
 
-    // find unit clause and if it exists, 
-    Clause? unitClause = F.Clauses.FirstOrDefault(c => c.Literals.Count() == 1);
-    if (unitClause != null)
-    {
-        // remove all clauses containing the same literal as the one in the unitClause
-        F.Clauses.RemoveAll(c => c.Literals.Any(l => l == unitClause.Literals.First()));
-
-        // and remove all instances of negation of the literal in all Clauses
-        F.Clauses.ForEach(c => c.Literals.RemoveAll(l => l == -unitClause.Literals.First()));
-
-        return DPLL(F, ref countCalls);
-    }
 
     // else, use Heuristic to select a literal 
-    int selected = Heuristic.DLCS(F);   // TODO change heuristic by parameter
+    int selected;
+    switch (H)
+    {
+        case "DLIS":
+            selected = Heuristic.DLIS(F);
+            break;
+        case "DLCS":
+            selected = Heuristic.DLCS(F);
+            break;
+        case "MOM":
+            selected = Heuristic.MOM(F);
+            break;
+        case "BOHM":
+            selected = Heuristic.BOHM(F);
+            break;
+        default:
+            throw new Exception("Heuristic not found");
+    }
+    Heuristic.BOHM(F);
     Formula Fcopy = F.Copy();
 
     // test if removing negation of this literal resulted in SAT
-    Fcopy.Clauses.RemoveAll(c => c.Literals.Any(l => l == -selected));
-    Fcopy.Clauses.ForEach(c => c.Literals.RemoveAll(l => l == selected));
-    if (DPLL(Fcopy, ref countCalls))
+    Fcopy.RemoveClausesContainingLiteralAndRemoveNegationOfLiteralFromAllOtherClauses(-selected);
+    
+    if (DPLL(Fcopy, ref countCalls, H))
     {
         return true;
     }
     // otherwise remove not-negative instance of this literal
     else
     {
-        F.Clauses.RemoveAll(c => c.Literals.Any(l => l == selected));
-        F.Clauses.ForEach(c => c.Literals.RemoveAll(l => l == -selected));
-        return DPLL(F, ref countCalls);
+        F.RemoveClausesContainingLiteralAndRemoveNegationOfLiteralFromAllOtherClauses(selected);
+        return DPLL(F, ref countCalls, H);
     }
 
 
