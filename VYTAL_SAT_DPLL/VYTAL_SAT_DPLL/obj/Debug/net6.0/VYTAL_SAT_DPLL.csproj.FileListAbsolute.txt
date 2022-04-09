@@ -1,0 +1,15 @@
+C:\Users\ofgag\source\repos\VYTAL_SAT_DPLL\VYTAL_SAT_DPLL\bin\Debug\net6.0\VYTAL_SAT_DPLL.exe
+C:\Users\ofgag\source\repos\VYTAL_SAT_DPLL\VYTAL_SAT_DPLL\bin\Debug\net6.0\VYTAL_SAT_DPLL.deps.json
+C:\Users\ofgag\source\repos\VYTAL_SAT_DPLL\VYTAL_SAT_DPLL\bin\Debug\net6.0\VYTAL_SAT_DPLL.runtimeconfig.json
+C:\Users\ofgag\source\repos\VYTAL_SAT_DPLL\VYTAL_SAT_DPLL\bin\Debug\net6.0\VYTAL_SAT_DPLL.dll
+C:\Users\ofgag\source\repos\VYTAL_SAT_DPLL\VYTAL_SAT_DPLL\bin\Debug\net6.0\VYTAL_SAT_DPLL.pdb
+C:\Users\ofgag\source\repos\VYTAL_SAT_DPLL\VYTAL_SAT_DPLL\obj\Debug\net6.0\VYTAL_SAT_DPLL.csproj.AssemblyReference.cache
+C:\Users\ofgag\source\repos\VYTAL_SAT_DPLL\VYTAL_SAT_DPLL\obj\Debug\net6.0\VYTAL_SAT_DPLL.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ofgag\source\repos\VYTAL_SAT_DPLL\VYTAL_SAT_DPLL\obj\Debug\net6.0\VYTAL_SAT_DPLL.AssemblyInfoInputs.cache
+C:\Users\ofgag\source\repos\VYTAL_SAT_DPLL\VYTAL_SAT_DPLL\obj\Debug\net6.0\VYTAL_SAT_DPLL.AssemblyInfo.cs
+C:\Users\ofgag\source\repos\VYTAL_SAT_DPLL\VYTAL_SAT_DPLL\obj\Debug\net6.0\VYTAL_SAT_DPLL.csproj.CoreCompileInputs.cache
+C:\Users\ofgag\source\repos\VYTAL_SAT_DPLL\VYTAL_SAT_DPLL\obj\Debug\net6.0\VYTAL_SAT_DPLL.dll
+C:\Users\ofgag\source\repos\VYTAL_SAT_DPLL\VYTAL_SAT_DPLL\obj\Debug\net6.0\refint\VYTAL_SAT_DPLL.dll
+C:\Users\ofgag\source\repos\VYTAL_SAT_DPLL\VYTAL_SAT_DPLL\obj\Debug\net6.0\VYTAL_SAT_DPLL.pdb
+C:\Users\ofgag\source\repos\VYTAL_SAT_DPLL\VYTAL_SAT_DPLL\obj\Debug\net6.0\VYTAL_SAT_DPLL.genruntimeconfig.cache
+C:\Users\ofgag\source\repos\VYTAL_SAT_DPLL\VYTAL_SAT_DPLL\obj\Debug\net6.0\ref\VYTAL_SAT_DPLL.dll
