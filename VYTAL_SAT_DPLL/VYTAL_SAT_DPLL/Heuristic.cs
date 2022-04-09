@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,9 +28,10 @@ namespace VYTAL_SAT_DPLL
             //Console.WriteLine(literalWithMaxOccurrences);
             return literalWithMaxOccurrences;
         }
-
+        
         public static int MOM(Formula F)
         {
+            Stopwatch sw = Stopwatch.StartNew();
             Clause shortest = F.Clauses.OrderBy(c => c.Literals.Count).First();
             int p = F.Clauses.SelectMany(c => c.Literals.Distinct()).Count();
             p = p * p + 1;
@@ -71,7 +73,8 @@ namespace VYTAL_SAT_DPLL
                     lastResult = newResult;
                 }
             }
-
+            sw.Stop();
+            Console.WriteLine(sw.ElapsedTicks);
             return selected;
         }
 
@@ -122,8 +125,8 @@ namespace VYTAL_SAT_DPLL
 
         public static int BOHM(Formula F)
         {
-            List<int> literals = F.Clauses.SelectMany(c => c.Literals.Distinct()).ToList();
-            literals.RemoveAll(l => l == -l);
+            List<int> uniqueLiterals = F.Clauses.SelectMany(c => c.Literals.Distinct()).ToList();
+            uniqueLiterals.RemoveAll(l => l == -l);
             const int p1 = 1;
             const int p2 = 2;
 
@@ -134,7 +137,7 @@ namespace VYTAL_SAT_DPLL
             // Hi(x) is vector of occurrences of x in clauses of length i
             List<Pair> vectors = new List<Pair>();
 
-            foreach (int literal in literals)
+            foreach (int literal in uniqueLiterals)
             {
                 Pair vector = new Pair();
                 vector.literal = literal;
@@ -161,7 +164,7 @@ namespace VYTAL_SAT_DPLL
             }
             return selected;
         }
-        
+
 
         
         public struct Pair
@@ -172,9 +175,22 @@ namespace VYTAL_SAT_DPLL
 
 
 
-        public static int Custom(Formula F)
+        public static int CUSTOM(Formula F)
         {
-            return 0;
+            return F.Clauses.First().Literals.First();
+        }
+
+
+
+        public static int RANDOM(Formula F)
+        {
+            Random random = new Random();
+            int amountOfClauses = F.Clauses.Count();
+            Clause randomClause = F.Clauses[random.Next(amountOfClauses)];
+
+            int amoutOfLiterals = randomClause.Literals.Count();
+            int literal = randomClause.Literals[random.Next(amoutOfLiterals)];
+            return literal;
         }
     }
 }

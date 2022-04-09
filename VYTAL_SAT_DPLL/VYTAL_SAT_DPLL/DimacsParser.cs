@@ -34,10 +34,15 @@ namespace VYTAL_SAT_DPLL
                 else
                 {
                     Clause clause = new Clause();
-                    string[] literals = line.Split(' ');
+                    string replaced = line.Replace('\t', ' ');
+                    string[] literals = replaced.Split(' ');
                     foreach (string literal in literals)
                     {
                         if (literal.StartsWith("0"))
+                        {
+                            break;
+                        }
+                        else if(literal.Equals(""))
                         {
                             break;
                         }

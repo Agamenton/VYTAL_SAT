@@ -1,6 +1,11 @@
 ﻿
+using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using VYTAL_SAT_DPLL;
 
+/*
+ * MAIN
+ */
 
 string filePath = "test.dimacs";
 Formula F;
@@ -27,49 +32,58 @@ catch (OverflowException e )
     throw e;
 }
 
-
-Console.WriteLine(F);
-Console.WriteLine();
-long countCalls = 0;
-//Console.WriteLine("\nDPLL says that this Formula " + (DPLL(F, ref countCalls) ? "IS satisfiable" : "is NOT satisfiable"));
-//Console.WriteLine("DPLL was called " + countCalls + " times");
-
-HeuristicsTest();
+RunDPLL(F);
 
 
-void HeuristicsTest()
+
+
+/*
+ * END OF MAIN
+ */
+
+
+
+
+
+static void RunDPLL(Formula F)
 {
-    Formula f = new();
-    
+    List<string> heuristics = new List<string>()
+        {"DLIS", "DLCS", "MOM", "BOHM", "CUSTOM"};
 
-        Console.WriteLine("----------------------------------------------------");
+    Task[] tasks = new Task[heuristics.Count];
+    int heuristicIterator = 0;
+    foreach (string heuristic in heuristics)
+    {
+        tasks[heuristicIterator] = Task.Run(() =>
+        {
+            TestDPLL(F.Copy(), heuristic);
+            return 0;
+        });
+        if (heuristicIterator < heuristics.Count-1)
+        {
+            heuristicIterator++;
+        }
+    }
 
-    Formula original = DimacsParser.Parse(filePath);
-    
-    
-    //Console.WriteLine("Formula: [" + f.InputLiterals + "; " + f.InputClauses + "]");
-    Console.WriteLine("Is satisfiable: DLIS: " + (DPLL(F.Copy(), ref countCalls, "DLIS") ? "IS satisfiable" : "is NOT satisfiable"));
-    Console.WriteLine("Recursive calls: DLIS: " + countCalls);
-    countCalls = 0;
-    Console.WriteLine();
-
-    Console.WriteLine("Is satisfiable: DLCS: " + (DPLL(F.Copy(), ref countCalls, "DLCS") ? "IS satisfiable" : "is NOT satisfiable"));
-    Console.WriteLine("Recursive calls: DLCS: " + countCalls);
-    countCalls = 0;
-    Console.WriteLine();
-
-    Console.WriteLine("Is satisfiable: MOM: " + (DPLL(F.Copy(), ref countCalls, "MOM") ? "IS satisfiable" : "is NOT satisfiable"));
-    Console.WriteLine("Recursive calls: MOM: " + countCalls);
-    countCalls = 0;
-    Console.WriteLine();
-
-    Console.WriteLine("Is satisfiable: BOHM: " + (DPLL(F.Copy(), ref countCalls, "BOHM") ? "IS satisfiable" : "is NOT satisfiable"));
-    Console.WriteLine("Recursive calls: BOHM: " + countCalls);
-    countCalls = 0;
-    Console.WriteLine();
-
-
+    Task.WaitAll(tasks);
 }
+
+
+
+static void TestDPLL(Formula F, string H)
+{
+    Stopwatch sw = new Stopwatch();
+    long counter = 0;
+    sw.Start();
+    bool result = DPLL(F, ref counter, H);
+    sw.Stop();
+    Console.WriteLine("\n--------------------------------\n" +
+                      "Running Heuristic: " + H + "\n" +
+                      "Satisfiable?: " + (result ? "YES" : "NO") +"\n" +
+                      "DPLL calls:   " + counter + "\n"+
+                      "Time elapsed: " + sw.Elapsed.Minutes +"min " + sw.Elapsed.Seconds+"s " + sw.Elapsed.Milliseconds +"ms");
+}
+
 
 
 static bool DPLL(Formula F, ref long countCalls, string H)
@@ -116,6 +130,12 @@ static bool DPLL(Formula F, ref long countCalls, string H)
             break;
         case "BOHM":
             selected = Heuristic.BOHM(F);
+            break;
+        case "CUSTOM":
+            selected = Heuristic.CUSTOM(F);
+            break;
+        case "RANDOM":
+            selected = Heuristic.RANDOM(F);
             break;
         default:
             throw new Exception("Heuristic not found");
