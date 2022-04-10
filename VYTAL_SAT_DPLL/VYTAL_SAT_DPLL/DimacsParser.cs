@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 
 namespace VYTAL_SAT_DPLL
 {
@@ -12,50 +8,60 @@ namespace VYTAL_SAT_DPLL
 
         public static Formula Parse(string path)
         {
-            List<Clause> clauses = new List<Clause>();
             string line;
             System.IO.StreamReader file = new System.IO.StreamReader(path);
+
+
+            string fileText = "";
+
             while ((line = file.ReadLine()) != null)
             {
                 if (line.StartsWith("c"))
                 {
-                    Console.WriteLine(line);
                     continue;
                 }
-                else if (line.StartsWith("p"))
+                if (line.StartsWith("p"))
                 {
-                    Console.WriteLine(line);
                     continue;
                 }
-                else if (line.StartsWith("%"))
+                if (line.StartsWith("%"))
+                {
+                    continue;
+                }
+
+                fileText += " ";
+                fileText += line;
+            }
+            file.Close();
+            
+            fileText = fileText.Trim();
+            fileText = fileText.Replace("\t", " ");
+
+            string[] elements = fileText.Split(' ');
+
+            Formula formula = new Formula();
+
+
+            Clause clause = new Clause();
+
+            for (long i = 0; i < elements.Length; i++)
+            {
+                if (elements[i] == "0")
+                {
+                    formula.Clauses.Add(clause);
+                    clause = new Clause();
+                }
+                else if (elements[i] == "")
                 {
                     continue;
                 }
                 else
                 {
-                    Clause clause = new Clause();
-                    string replaced = line.Replace('\t', ' ');
-                    string[] literals = replaced.Split(' ');
-                    foreach (string literal in literals)
-                    {
-                        if (literal.StartsWith("0"))
-                        {
-                            break;
-                        }
-                        else if(literal.Equals(""))
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            clause.Literals.Add(Convert.ToInt32(literal));
-                        }
-                    }
-                    clauses.Add(clause);
+                    clause.Literals.Add(Convert.ToInt32(elements[i]));
                 }
             }
-            file.Close();
-            return new Formula(clauses);
+
+            return formula;
         }
     }
 }

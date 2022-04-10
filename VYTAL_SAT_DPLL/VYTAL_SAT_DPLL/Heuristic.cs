@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace VYTAL_SAT_DPLL
+﻿namespace VYTAL_SAT_DPLL
 {
     public class Heuristic
     {
@@ -15,8 +8,9 @@ namespace VYTAL_SAT_DPLL
             List<int> allLiterals = F.GetAllLiterals();
             List<int> uniqueLiterals = allLiterals.Distinct().ToList();
 
+            // we take literal and !literal as two different literals in this heuristic
             int literalWithMaxOccurrences = uniqueLiterals[0];
-            //Console.WriteLine("before " + literalWithMaxOccurrences);
+            
             foreach (int literal in uniqueLiterals)
             {
                 if (allLiterals.Count(c => c == literal) > allLiterals.Count(c => c == literalWithMaxOccurrences))
@@ -24,14 +18,12 @@ namespace VYTAL_SAT_DPLL
                     literalWithMaxOccurrences = literal;
                 }
             }
-
-            //Console.WriteLine(literalWithMaxOccurrences);
+            
             return literalWithMaxOccurrences;
         }
-        
+
         public static int MOM(Formula F)
         {
-            Stopwatch sw = Stopwatch.StartNew();
             Clause shortest = F.Clauses.OrderBy(c => c.Literals.Count).First();
             int p = F.Clauses.SelectMany(c => c.Literals.Distinct()).Count();
             p = p * p + 1;
@@ -41,7 +33,7 @@ namespace VYTAL_SAT_DPLL
 
             // save here how many times each literal appears in the clauses of length k
             List<Trio> literals = new List<Trio>();
-            
+
             // for each clause
             foreach (Clause clause in F.Clauses)
             {
@@ -73,8 +65,6 @@ namespace VYTAL_SAT_DPLL
                     lastResult = newResult;
                 }
             }
-            sw.Stop();
-            Console.WriteLine(sw.ElapsedTicks);
             return selected;
         }
 
@@ -83,7 +73,7 @@ namespace VYTAL_SAT_DPLL
             public int literal;
             public int occurrences;
             public int negativeOccurrences;
-            
+
             public Trio(int literal, int occurrences, int negativeOccurrences)
             {
                 this.literal = literal;
@@ -125,15 +115,14 @@ namespace VYTAL_SAT_DPLL
 
         public static int BOHM(Formula F)
         {
-            List<int> uniqueLiterals = F.Clauses.SelectMany(c => c.Literals.Distinct()).ToList();
-            uniqueLiterals.RemoveAll(l => l == -l);
+            List<int> uniqueLiterals = F.UniqueLiterals();
             const int p1 = 1;
             const int p2 = 2;
 
 
             List<int> lengths = F.Clauses.Select(c => c.Literals.Count).Distinct().ToList();
             lengths.Sort();
-            
+
             // Hi(x) is vector of occurrences of x in clauses of length i
             List<Pair> vectors = new List<Pair>();
 
@@ -141,16 +130,16 @@ namespace VYTAL_SAT_DPLL
             {
                 Pair vector = new Pair();
                 vector.literal = literal;
-                
+
                 foreach (int length in lengths)
                 {
                     // fi(x) is the number of not yet satisfied clauses with i literals that contain the literal x
-                    vector.vector += p1*Math.Max(F.CountClausesOfGivenLengthThatContainLiteral(literal,length), F.CountClausesOfGivenLengthThatContainLiteral(-literal,length)) 
-                                    + p2*Math.Min(F.CountClausesOfGivenLengthThatContainLiteral(literal, length), F.CountClausesOfGivenLengthThatContainLiteral(-literal, length));
+                    vector.vector += p1 * Math.Max(F.CountClausesOfGivenLengthThatContainLiteral(literal, length), F.CountClausesOfGivenLengthThatContainLiteral(-literal, length))
+                                    + p2 * Math.Min(F.CountClausesOfGivenLengthThatContainLiteral(literal, length), F.CountClausesOfGivenLengthThatContainLiteral(-literal, length));
                     vectors.Add(vector);
                 }
             }
-            
+
             int selected = vectors[0].literal;
             int lastResult = vectors[0].vector;
             foreach (Pair vector in vectors)
@@ -166,7 +155,7 @@ namespace VYTAL_SAT_DPLL
         }
 
 
-        
+
         public struct Pair
         {
             public int literal;
@@ -175,7 +164,7 @@ namespace VYTAL_SAT_DPLL
 
 
 
-        public static int CUSTOM(Formula F)
+        public static int FIRSTFIRST(Formula F)
         {
             return F.Clauses.First().Literals.First();
         }

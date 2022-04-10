@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
+using System.Threading.Channels;
 
 namespace VYTAL_SAT_DPLL
 {
     public class Formula
     {
         public List<Clause> Clauses { get; set; }
-        public int Variables { get; set; }
-        public int ClausesCount { get; set; }
 
         public Formula()
         {
@@ -40,8 +35,8 @@ namespace VYTAL_SAT_DPLL
 
             return null;
         }
-        
-        
+
+
 
         public List<int> GetAllLiterals()
         {
@@ -105,6 +100,22 @@ namespace VYTAL_SAT_DPLL
         }
 
 
+        public List<int> UniqueLiterals()
+        {
+            List<int> distinct = Clauses.SelectMany(x => x.Literals).Distinct().ToList();
+            List<int> result = new List<int>();
+
+            // copy unique literals to result only if there already isn't a negative version of the literal
+            foreach (int literal in distinct)
+            {
+                if (!result.Contains(-literal))
+                {
+                    result.Add(literal);
+                }
+            }
+            return result;
+        }
+
 
         public override string ToString()
         {
@@ -116,6 +127,14 @@ namespace VYTAL_SAT_DPLL
             }
             sb.Append("}");
             return sb.ToString();
+        }
+
+        public void PrintClauses()
+        {
+            foreach (Clause clause in Clauses)
+            {
+                Console.WriteLine(clause.ToString());
+            }
         }
 
 
