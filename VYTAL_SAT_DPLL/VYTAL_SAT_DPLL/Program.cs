@@ -22,12 +22,22 @@ class Program
     public static void Main(string[] args)
     {
         Console.WriteLine("Program Started !");
+        Console.Write("Heuristics: [");
+        Heuristics.ForEach(h =>
+        {
+            Console.Write(h);
+            if (Heuristics.Last() != h)
+            {
+                Console.Write("; ");
+            }
+        });
+        Console.WriteLine("]");
         
         // init dictionary
         InitDictionary();
 
         // get input file
-        string filePath = TestPath("test.dimacs");
+        string filePath = TestPath("hole10.cnf");
 
         // load formula from that file
         Formula F = LoadFormula(filePath);
