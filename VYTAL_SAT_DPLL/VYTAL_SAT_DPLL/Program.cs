@@ -37,7 +37,8 @@ class Program
         InitDictionary();
 
         // get input file
-        string filePath = TestPath("hole10.cnf");
+        string filePath = TestPath("test.dimacs");
+        Console.WriteLine("File: " + filePath);
 
         // load formula from that file
         Formula F = LoadFormula(filePath);
@@ -271,7 +272,7 @@ class Program
         // then select the one that results in SAT
         if (GlobalCounter[H] < 3)
         {
-            Task<bool> task = Task.Run(() => ParalelDPLL(Fcopy, H));
+            Task<bool> task = Task.Run(() => DPLL(Fcopy, H));
 
             F.RemoveClausesContainingLiteralAndRemoveNegationOfLiteralFromAllOtherClauses(selected);
             bool result = DPLL(F, H);
@@ -301,12 +302,6 @@ class Program
                 return DPLL(F, H);
             }
         }
-    }
-
-    static bool ParalelDPLL(Formula F, string H)
-    {
-        bool tmpResult = DPLL(F, H);
-        return tmpResult;
     }
 }
 
